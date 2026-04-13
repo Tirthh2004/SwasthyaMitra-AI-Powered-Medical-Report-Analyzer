@@ -1,0 +1,10 @@
+Flask
+python-dotenv
+groq
+openpyxl
+pypdf
+opencv-python
+numpy
+pdfplumber
+pytesseract
+Pillow

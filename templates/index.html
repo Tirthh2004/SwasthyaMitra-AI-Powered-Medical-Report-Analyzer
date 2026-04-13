@@ -1,0 +1,1781 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SwasthyaMitra — AI Medical Report Analyzer</title>
+    <meta name="description"
+        content="Upload your medical report and get an easy-to-understand AI-powered analysis in simple language.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/static/styles.css">
+
+    <!-- Chart.js for Trend Charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Leaflet.js for Doctor Map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+
+<body>
+
+    <!-- ========== TOP NAVIGATION BAR ========== -->
+    <nav class="topbar" id="navbar">
+        <div class="topbar-inner">
+            <!-- Logo with Mandala Lotus -->
+            <a href="/" class="logo">
+                <div class="logo-icon">
+                    <svg width="42" height="42" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Outer ring -->
+                        <circle cx="50" cy="50" r="46" stroke="#c4b5fd" stroke-width="1.5" fill="none" opacity="0.5" />
+                        <!-- Petals (8 directions) -->
+                        <ellipse cx="50" cy="28" rx="8" ry="18" fill="#c4b5fd" opacity="0.45"
+                            transform="rotate(0,50,50)" />
+                        <ellipse cx="50" cy="28" rx="8" ry="18" fill="#c4b5fd" opacity="0.45"
+                            transform="rotate(45,50,50)" />
+                        <ellipse cx="50" cy="28" rx="8" ry="18" fill="#c4b5fd" opacity="0.45"
+                            transform="rotate(90,50,50)" />
+                        <ellipse cx="50" cy="28" rx="8" ry="18" fill="#c4b5fd" opacity="0.45"
+                            transform="rotate(135,50,50)" />
+                        <ellipse cx="50" cy="28" rx="8" ry="18" fill="#c4b5fd" opacity="0.45"
+                            transform="rotate(180,50,50)" />
+                        <ellipse cx="50" cy="28" rx="8" ry="18" fill="#c4b5fd" opacity="0.45"
+                            transform="rotate(225,50,50)" />
+                        <ellipse cx="50" cy="28" rx="8" ry="18" fill="#c4b5fd" opacity="0.45"
+                            transform="rotate(270,50,50)" />
+                        <ellipse cx="50" cy="28" rx="8" ry="18" fill="#c4b5fd" opacity="0.45"
+                            transform="rotate(315,50,50)" />
+                        <!-- Inner petals (smaller, rotated 22.5°) -->
+                        <ellipse cx="50" cy="34" rx="5" ry="12" fill="#a78bfa" opacity="0.5"
+                            transform="rotate(22.5,50,50)" />
+                        <ellipse cx="50" cy="34" rx="5" ry="12" fill="#a78bfa" opacity="0.5"
+                            transform="rotate(67.5,50,50)" />
+                        <ellipse cx="50" cy="34" rx="5" ry="12" fill="#a78bfa" opacity="0.5"
+                            transform="rotate(112.5,50,50)" />
+                        <ellipse cx="50" cy="34" rx="5" ry="12" fill="#a78bfa" opacity="0.5"
+                            transform="rotate(157.5,50,50)" />
+                        <ellipse cx="50" cy="34" rx="5" ry="12" fill="#a78bfa" opacity="0.5"
+                            transform="rotate(202.5,50,50)" />
+                        <ellipse cx="50" cy="34" rx="5" ry="12" fill="#a78bfa" opacity="0.5"
+                            transform="rotate(247.5,50,50)" />
+                        <ellipse cx="50" cy="34" rx="5" ry="12" fill="#a78bfa" opacity="0.5"
+                            transform="rotate(292.5,50,50)" />
+                        <ellipse cx="50" cy="34" rx="5" ry="12" fill="#a78bfa" opacity="0.5"
+                            transform="rotate(337.5,50,50)" />
+                        <!-- Center circle -->
+                        <circle cx="50" cy="50" r="8" fill="#8b5cf6" />
+                        <circle cx="50" cy="50" r="4" fill="#c4b5fd" />
+                    </svg>
+                </div>
+                <div class="logo-brand">
+                    <div class="logo-text">Swasthya<span>Mitra</span></div>
+                    <div class="logo-hindi">स्वास्थ्य मित्र</div>
+                </div>
+            </a>
+
+            <!-- Center tagline -->
+            <div class="topbar-tagline">Your health, our friendship</div>
+
+            <!-- Right actions -->
+            <div class="topbar-actions">
+                <!-- Dark Mode Toggle -->
+                <button class="dark-mode-toggle" id="darkModeToggle" onclick="toggleDarkMode()"
+                    title="Toggle Dark Mode">
+                    <svg class="dm-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="5" />
+                        <line x1="12" y1="1" x2="12" y2="3" />
+                        <line x1="12" y1="21" x2="12" y2="23" />
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                        <line x1="1" y1="12" x2="3" y2="12" />
+                        <line x1="21" y1="12" x2="23" y2="12" />
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                    </svg>
+                    <svg class="dm-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" style="display:none;">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                    </svg>
+                </button>
+
+                <!-- Notification bell -->
+                <button class="topbar-icon-btn" title="Notifications">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                    </svg>
+                    <span class="topbar-notif-dot"></span>
+                </button>
+
+                <!-- User avatar -->
+                <div class="topbar-avatar" title="User Profile">
+                    <span>TS</span>
+                </div>
+
+                <!-- Mobile hamburger -->
+                <div class="hamburger" id="hamburger" onclick="toggleMenu()">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ========== APP SHELL: Sidebar + Main ========== -->
+    <div class="app-shell">
+
+        <!-- ===== SIDEBAR ===== -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-nav">
+                <div class="sidebar-section-label">MENU</div>
+                <ul class="sidebar-links" id="navLinks">
+                    <li>
+                        <a href="/" class="active" data-section="home" onclick="showSection('home')">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                                <polyline points="9 22 9 12 15 12 15 22" />
+                            </svg>
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#dashboard" data-section="dashboard" onclick="showSection('dashboard')">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <rect x="3" y="3" width="7" height="7" />
+                                <rect x="14" y="3" width="7" height="7" />
+                                <rect x="14" y="14" width="7" height="7" />
+                                <rect x="3" y="14" width="7" height="7" />
+                            </svg>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#history" data-section="history" onclick="showSection('history')">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <circle cx="12" cy="12" r="10" />
+                                <polyline points="12 6 12 12 16 14" />
+                            </svg>
+                            <span>History</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#about" data-section="about" onclick="showSection('about')">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <circle cx="12" cy="12" r="10" />
+                                <line x1="12" y1="16" x2="12" y2="12" />
+                                <line x1="12" y1="8" x2="12.01" y2="8" />
+                            </svg>
+                            <span>About</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#support" data-section="support" onclick="showSection('support')">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path stroke="currentColor" stroke-width="2"
+                                    d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path>
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="2" d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="2" d="M12 17h.01"></path>
+                            </svg>
+                            <span>Help & Support</span>
+                        </a>
+                    </li>
+                </ul>
+
+                <div class="sidebar-section-label" style="margin-top: 24px;">TOOLS</div>
+                <ul class="sidebar-links">
+                    <li>
+                        <a href="javascript:void(0)" onclick="document.getElementById('fileInput').click()">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <polyline points="17 8 12 3 7 8" />
+                                <line x1="12" y1="3" x2="12" y2="15" />
+                            </svg>
+                            <span>Upload Report</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="javascript:void(0)" onclick="toggleChatbot()">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                            </svg>
+                            <span>SwasthyaBot</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- System status at bottom of sidebar -->
+            <div class="sidebar-bottom">
+                <div class="sidebar-system-status">
+                    <div class="sidebar-system-dot online"></div>
+                    <span>All Systems Online</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- ===== MAIN CONTENT AREA ===== -->
+        <main class="main-content">
+
+            <!-- Background Bubbles -->
+            <div class="bg-bubbles">
+                <div class="bubble bubble-1"></div>
+                <div class="bubble bubble-2"></div>
+                <div class="bubble bubble-3"></div>
+                <div class="bubble bubble-4"></div>
+                <div class="bubble bubble-5"></div>
+                <div class="bubble bubble-6"></div>
+                <div class="bubble bubble-7"></div>
+                <div class="bubble bubble-8"></div>
+            </div>
+
+
+            <!-- ===== HOME SECTION ===== -->
+            <div id="home" class="section active">
+                <div class="hero">
+                    <h1>
+                        Your Medical Reports, <br> Made Simple <br>
+                    </h1>
+                    <p>Upload your medical reports and get clear, easy-to-understand summaries in plain
+                        language&mdash;powered by AI</p>
+                </div>
+
+                <!-- Upload Zone (Interactive Drag & Drop) -->
+                <div class="upload-zone interactive" id="uploadZone"
+                    onclick="document.getElementById('fileInput').click()">
+                    <input type="file" id="fileInput" hidden accept=".pdf,.png,.jpg,.jpeg">
+                    <svg class="dropzone-border" width="100%" height="100%">
+                        <rect x="2" y="2" width="calc(100% - 4px)" height="calc(100% - 4px)" rx="24" ry="24" />
+                    </svg>
+                    <div class="upload-content">
+                        <div class="upload-icon-wrap">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <polyline points="17 8 12 3 7 8" />
+                                <line x1="12" y1="3" x2="12" y2="15" />
+                            </svg>
+                        </div>
+                        <h3>Upload or Drop Report Here</h3>
+                        <p>Support for PDF, PNG, JPG (Max 16MB)</p>
+                    </div>
+                </div>
+
+                <!-- Features Section -->
+                <div class="features-grid" id="landingFeatures">
+                    <!-- Card 1 -->
+                    <div class="feature-card">
+                        <div class="feature-icon-box green">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                <polyline points="14 2 14 8 20 8" />
+                                <line x1="16" y1="13" x2="8" y2="13" />
+                                <line x1="16" y1="17" x2="8" y2="17" />
+                                <polyline points="10 9 9 9 8 9" />
+                            </svg>
+                        </div>
+                        <h3>Easy Upload</h3>
+                        <p>Simply drag and drop your medical reports. We support PDF, Images, and scanned documents.</p>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div class="feature-card">
+                        <div class="feature-icon-box green">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <circle cx="12" cy="12" r="10" />
+                                <polyline points="12 6 12 12 16 14" />
+                            </svg>
+                        </div>
+                        <h3>Instant Analysis</h3>
+                        <p>Our AI processes your report in seconds, extracting key information and medical data.</p>
+                    </div>
+
+                    <!-- Card 3 -->
+                    <div class="feature-card">
+                        <div class="feature-icon-box green">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <polyline points="7 10 12 15 17 10" />
+                                <line x1="12" y1="15" x2="12" y2="3" />
+                            </svg>
+                        </div>
+                        <h3>Understandable Layman Language</h3>
+                        <p>Get your results explained in simple, non-medical terms that anyone can understand.</p>
+                    </div>
+                </div>
+
+                <!-- Home Disclaimer -->
+                <div class="home-disclaimer" id="homeDisclaimer">
+                    <div class="disclaimer-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path
+                                d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                            <line x1="12" y1="9" x2="12" y2="13" />
+                            <line x1="12" y1="17" x2="12.01" y2="17" />
+                        </svg>
+                    </div>
+                    <div>
+                        <strong>Important Medical Disclaimer</strong>
+                        <p>SwasthyaMitra is an AI tool for medical report analysis. It is <strong>not a substitute
+                                for
+                                professional medical advice</strong>, diagnosis, or treatment. Always consult a
+                            qualified healthcare provider/doctor for any medical concerns. SwasthyaMitra shall
+                            not be held responsible for any actions taken based on its output.</p>
+                    </div>
+                </div>
+
+                <!-- File Preview (shown after file is selected) -->
+                <div class="file-preview" id="filePreview">
+                    <div class="file-preview-card">
+                        <div class="file-preview-icon" id="filePreviewIcon">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                <polyline points="14 2 14 8 20 8" />
+                            </svg>
+                        </div>
+                        <div class="file-preview-info">
+                            <h4 id="filePreviewName">report.pdf</h4>
+                            <p id="filePreviewSize">2.3 MB</p>
+                        </div>
+                        <button class="file-preview-remove" onclick="removeFile()" title="Remove file">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18" />
+                                <line x1="6" y1="6" x2="18" y2="18" />
+                            </svg>
+                        </button>
+                    </div>
+                    <label style="display:flex;align-items:center;gap:10px;margin:12px 0 14px 2px;font-size:14px;color:#475569;cursor:pointer;">
+                        <input type="checkbox" id="ecgGraphToggle" style="width:16px;height:16px;">
+                        This is an ECG Graph (waveform image)
+                    </label>
+                    <button class="btn btn-primary btn-lg" onclick="startAnalysis()">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                        </svg>
+                        Analyze Report
+                    </button>
+                </div>
+
+                <!-- Loading State -->
+                <div class="loading-container" id="loadingContainer">
+                    <div class="loader-wrap">
+                        <div class="pulse-ring"></div>
+                        <svg class="loader-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#2E7D32"
+                            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                        </svg>
+                    </div>
+                    <h3>Analyzing Your Report...</h3>
+                    <p class="loader-sub">This usually takes 10–15 seconds</p>
+
+                    <div class="loading-cards">
+                        <div class="load-card" id="step1">
+                            <div class="load-icon-box" id="iconBox1"><span id="iconText1">1</span></div>
+                            <div class="load-content">
+                                <h4>Document uploaded</h4>
+                                <p>File received successfully</p>
+                            </div>
+                        </div>
+                        <div class="load-card" id="step2">
+                            <div class="load-icon-box" id="iconBox2"><span id="iconText2">2</span></div>
+                            <div class="load-content">
+                                <h4>Extracting medical data</h4>
+                                <p>Reading test results and values...</p>
+                            </div>
+                        </div>
+                        <div class="load-card" id="step3">
+                            <div class="load-icon-box" id="iconBox3"><span id="iconText3">3</span></div>
+                            <div class="load-content">
+                                <h4>Generating summary</h4>
+                                <p>Creating easy-to-read explanations</p>
+                            </div>
+                        </div>
+                        <div class="load-card" id="step4">
+                            <div class="load-icon-box" id="iconBox4"><span id="iconText4">4</span></div>
+                            <div class="load-content">
+                                <h4>Review ready</h4>
+                                <p>Your summary is being prepared</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results -->
+                <div class="results-container" id="resultsContainer">
+                    <div class="results-header">
+                        <div>
+                            <h2>Analysis Results</h2>
+                            <p class="results-sub">AI-powered medical report interpretation</p>
+                        </div>
+                        <div class="results-meta">
+                            <span class="tag" id="resultFilename">report.pdf</span>
+                            <span class="tag tag-time" id="resultTimestamp"></span>
+                        </div>
+                    </div>
+                    <div class="results-card">
+                        <div class="results-body" id="resultsBody"></div>
+                    </div>
+
+                    <!-- Health Risk Score (above action buttons) -->
+                    <div class="risk-score-section" id="riskScoreSection" style="display:none;">
+                        <div class="risk-score-card">
+                            <div class="risk-score-header">
+                                <h3>
+                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                                    </svg>
+                                    Health Risk Score
+                                </h3>
+                                <span class="risk-badge" id="riskBadge">—</span>
+                            </div>
+                            <div class="risk-gauge-wrap">
+                                <div class="risk-gauge">
+                                    <svg viewBox="0 0 200 120">
+                                        <path class="gauge-bg" d="M 20 100 A 80 80 0 0 1 180 100" />
+                                        <path class="gauge-fill" id="gaugeFill" d="M 20 100 A 80 80 0 0 1 180 100"
+                                            stroke-dasharray="251.33" stroke-dashoffset="251.33" />
+                                    </svg>
+                                    <div class="risk-score-value">
+                                        <div class="score-number" id="riskScoreNumber">—</div>
+                                        <div class="score-label">Risk Score</div>
+                                    </div>
+                                </div>
+                                <div class="risk-findings" id="riskFindings">
+                                    <h4>Key Findings</h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ===== HEALTH CHARTS VISUALIZATION DASHBOARD ===== -->
+                    <div class="health-charts-section" id="healthChartsSection" style="display:none;">
+                        <div class="health-charts-card">
+                            <div class="health-charts-header">
+                                <h3>
+                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <rect x="3" y="3" width="7" height="7" />
+                                        <rect x="14" y="3" width="7" height="7" />
+                                        <rect x="14" y="14" width="7" height="7" />
+                                        <rect x="3" y="14" width="7" height="7" />
+                                    </svg>
+                                    Visual Health Dashboard
+                                </h3>
+                                <div class="health-charts-subtitle">Interactive charts for instant understanding</div>
+                            </div>
+
+                            <!-- Chart Tabs -->
+                            <div class="hc-tabs" id="hcTabs">
+                                <button class="hc-tab active" data-chart="distribution"
+                                    onclick="switchHealthChart('distribution', this)">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <path d="M21.21 15.89A10 10 0 1 1 8 2.83" />
+                                        <path d="M22 12A10 10 0 0 0 12 2v10z" />
+                                    </svg>
+                                    Overview
+                                </button>
+                                <button class="hc-tab" data-chart="bars" onclick="switchHealthChart('bars', this)">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <line x1="18" y1="20" x2="18" y2="10" />
+                                        <line x1="12" y1="20" x2="12" y2="4" />
+                                        <line x1="6" y1="20" x2="6" y2="14" />
+                                    </svg>
+                                    Test Values
+                                </button>
+                                <button class="hc-tab" data-chart="radar" onclick="switchHealthChart('radar', this)">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <polygon
+                                            points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                                    </svg>
+                                    Body Systems
+                                </button>
+                            </div>
+
+                            <!-- Chart Panels -->
+                            <div class="hc-panels">
+                                <!-- Panel 1: Donut Distribution -->
+                                <div class="hc-panel active" id="hcPanelDistribution">
+                                    <div class="hc-panel-grid">
+                                        <div class="hc-canvas-box">
+                                            <canvas id="hcDonutChart"></canvas>
+                                        </div>
+                                        <div class="hc-legend-box" id="hcDonutLegend">
+                                            <!-- Filled by JS -->
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Panel 2: Horizontal Bars (Test Values) -->
+                                <div class="hc-panel" id="hcPanelBars">
+                                    <div class="hc-canvas-box hc-canvas-tall">
+                                        <canvas id="hcBarChart"></canvas>
+                                    </div>
+                                </div>
+
+                                <!-- Panel 3: Radar (Body Systems) -->
+                                <div class="hc-panel" id="hcPanelRadar">
+                                    <div class="hc-panel-grid">
+                                        <div class="hc-canvas-box">
+                                            <canvas id="hcRadarChart"></canvas>
+                                        </div>
+                                        <div class="hc-radar-summary" id="hcRadarSummary">
+                                            <!-- Filled by JS -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Quick Stats Row -->
+                            <div class="hc-quick-stats" id="hcQuickStats">
+                                <div class="hc-stat-pill normal">
+                                    <div class="hc-stat-icon">✅</div>
+                                    <div class="hc-stat-info">
+                                        <span class="hc-stat-num" id="hcStatNormal">0</span>
+                                        <span class="hc-stat-lbl">Normal</span>
+                                    </div>
+                                </div>
+                                <div class="hc-stat-pill elevated">
+                                    <div class="hc-stat-icon">⚠️</div>
+                                    <div class="hc-stat-info">
+                                        <span class="hc-stat-num" id="hcStatElevated">0</span>
+                                        <span class="hc-stat-lbl">Elevated</span>
+                                    </div>
+                                </div>
+                                <div class="hc-stat-pill abnormal">
+                                    <div class="hc-stat-icon">❌</div>
+                                    <div class="hc-stat-info">
+                                        <span class="hc-stat-num" id="hcStatAbnormal">0</span>
+                                        <span class="hc-stat-lbl">Abnormal</span>
+                                    </div>
+                                </div>
+                                <div class="hc-stat-pill total">
+                                    <div class="hc-stat-icon">📊</div>
+                                    <div class="hc-stat-info">
+                                        <span class="hc-stat-num" id="hcStatTotal">0</span>
+                                        <span class="hc-stat-lbl">Total Tests</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ===== DOCTOR MAP SECTION ===== -->
+                    <div class="doctor-map-section" id="doctorMapSection" style="display:none;">
+                        <div class="doctor-map-card">
+                            <div class="doctor-map-header">
+                                <h3>
+                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                                        <circle cx="12" cy="10" r="3" />
+                                    </svg>
+                                    Recommended Doctors Near You
+                                </h3>
+                                <div class="doctor-map-subtitle">Based on your report analysis</div>
+                            </div>
+                            <div class="doctor-map-specialties" id="doctorMapSpecialties"></div>
+                            <div class="doctor-map-body">
+                                <div id="doctorMap" class="doctor-map-container"></div>
+                                <div class="doctor-list-panel" id="doctorListPanel">
+                                    <div class="doctor-list-header">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2">
+                                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                                            <circle cx="9" cy="7" r="4" />
+                                            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                                            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                                        </svg>
+                                        <span id="doctorListCount">0 Doctors Found</span>
+                                    </div>
+                                    <div class="doctor-list-scroll" id="doctorListScroll"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action buttons (below Health Risk Score) -->
+                    <div class="results-actions">
+                        <button class="btn btn-primary" onclick="analyzeAnother()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <polyline points="17 8 12 3 7 8" />
+                                <line x1="12" y1="3" x2="12" y2="15" />
+                            </svg>
+                            Analyze Another
+                        </button>
+                        <button class="btn btn-outline" onclick="copyResults()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                            </svg>
+                            Copy to Clipboard
+                        </button>
+                        <button class="btn btn-green" onclick="downloadResultsPDF()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <polyline points="7 10 12 15 17 10" />
+                                <line x1="12" y1="15" x2="12" y2="3" />
+                            </svg>
+                            Download PDF
+                        </button>
+                        <button class="btn btn-orange" onclick="showSection('history')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <circle cx="12" cy="12" r="10" />
+                                <polyline points="12 6 12 12 16 14" />
+                            </svg>
+                            View History
+                        </button>
+
+                        <button class="btn btn-email" onclick="shareViaEmail()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                                <polyline points="22,6 12,13 2,6" />
+                            </svg>
+                            Email
+                        </button>
+
+                        <button class="btn btn-listen" id="listenAudioBtn" onclick="toggleListenAudio()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" id="listenIconPlay">
+                                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                                <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+                                <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+                            </svg>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" id="listenIconStop" style="display:none;">
+                                <rect x="6" y="4" width="4" height="16" />
+                                <rect x="14" y="4" width="4" height="16" />
+                            </svg>
+                            <span id="listenBtnText">Listen Audio</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== DASHBOARD SECTION ===== -->
+            <div id="dashboard" class="section">
+
+                <!-- Welcome Banner -->
+                <div class="dash-welcome">
+                    <div class="dash-welcome-content">
+                        <div class="dash-welcome-text">
+                            <span class="dash-greeting" id="dashGreeting">Good Afternoon</span>
+                            <h2>Your Health Dashboard</h2>
+                            <p>Track your medical analysis activity and manage reports efficiently.</p>
+                        </div>
+                        <div class="dash-welcome-visual">
+                            <div class="dash-welcome-orb"></div>
+                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)"
+                                stroke-width="1.5" stroke-linecap="round">
+                                <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Row 1: Stat Cards -->
+                <div class="dash-stats-grid">
+                    <!-- Total Reports -->
+                    <div class="dash-stat-card stat-green">
+                        <div class="dash-stat-accent"></div>
+                        <div class="dash-stat-header">
+                            <div class="dash-stat-icon-wrap green">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                    <polyline points="14 2 14 8 20 8" />
+                                </svg>
+                            </div>
+                            <div class="dash-stat-trend up">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2.5">
+                                    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+                                    <polyline points="17 6 23 6 23 12" />
+                                </svg>
+                                Active
+                            </div>
+                        </div>
+                        <div class="dash-stat-body">
+                            <span class="dash-stat-number" id="dashReportCount">0</span>
+                            <span class="dash-stat-label">Total Reports</span>
+                        </div>
+                        <div class="dash-stat-bar">
+                            <div class="dash-stat-bar-fill green" id="dashReportBar" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Last Analysis -->
+                    <div class="dash-stat-card stat-orange">
+                        <div class="dash-stat-accent orange"></div>
+                        <div class="dash-stat-header">
+                            <div class="dash-stat-icon-wrap orange">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <circle cx="12" cy="12" r="10" />
+                                    <polyline points="12 6 12 12 16 14" />
+                                </svg>
+                            </div>
+                            <div class="dash-stat-badge">
+                                <span class="dash-live-dot"></span>
+                                Recent
+                            </div>
+                        </div>
+                        <div class="dash-stat-body">
+                            <span class="dash-stat-number small" id="dashLastTime">No reports yet</span>
+                            <span class="dash-stat-label">Last Analysis</span>
+                        </div>
+                        <div class="dash-stat-bar">
+                            <div class="dash-stat-bar-fill orange" style="width: 100%"></div>
+                        </div>
+                    </div>
+
+                    <!-- PDFs -->
+                    <div class="dash-stat-card stat-teal">
+                        <div class="dash-stat-accent teal"></div>
+                        <div class="dash-stat-header">
+                            <div class="dash-stat-icon-wrap teal">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                    <polyline points="14 2 14 8 20 8" />
+                                    <line x1="16" y1="13" x2="8" y2="13" />
+                                    <line x1="16" y1="17" x2="8" y2="17" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="dash-stat-body">
+                            <span class="dash-stat-number" id="dashPdfCount">0</span>
+                            <span class="dash-stat-label">PDFs Analyzed</span>
+                        </div>
+                        <div class="dash-stat-bar">
+                            <div class="dash-stat-bar-fill teal" id="dashPdfBar" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Images -->
+                    <div class="dash-stat-card stat-purple">
+                        <div class="dash-stat-accent purple"></div>
+                        <div class="dash-stat-header">
+                            <div class="dash-stat-icon-wrap purple">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                                    <circle cx="8.5" cy="8.5" r="1.5" />
+                                    <polyline points="21 15 16 10 5 21" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="dash-stat-body">
+                            <span class="dash-stat-number" id="dashImgCount">0</span>
+                            <span class="dash-stat-label">Images Analyzed</span>
+                        </div>
+                        <div class="dash-stat-bar">
+                            <div class="dash-stat-bar-fill purple" id="dashImgBar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Row 2: Quick Actions + System Status -->
+                <div class="dash-bottom-row">
+                    <div class="dash-actions-row">
+                        <div class="dash-action-card" onclick="showSection('home')">
+                            <div class="dash-action-icon upload-action">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                    <polyline points="17 8 12 3 7 8" />
+                                    <line x1="12" y1="3" x2="12" y2="15" />
+                                </svg>
+                            </div>
+                            <div class="dash-action-text">
+                                <h4>Upload Report</h4>
+                                <p>Analyze a new medical document</p>
+                            </div>
+                            <svg class="dash-action-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2">
+                                <polyline points="9 18 15 12 9 6" />
+                            </svg>
+                        </div>
+                        <div class="dash-action-card" onclick="showSection('history')">
+                            <div class="dash-action-icon history-action">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <circle cx="12" cy="12" r="10" />
+                                    <polyline points="12 6 12 12 16 14" />
+                                </svg>
+                            </div>
+                            <div class="dash-action-text">
+                                <h4>View History</h4>
+                                <p>Browse past analysis results</p>
+                            </div>
+                            <svg class="dash-action-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2">
+                                <polyline points="9 18 15 12 9 6" />
+                            </svg>
+                        </div>
+                        <div class="dash-action-card" onclick="toggleChatbot()">
+                            <div class="dash-action-icon chat-action">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                                </svg>
+                            </div>
+                            <div class="dash-action-text">
+                                <h4>Ask SwasthyaBot</h4>
+                                <p>Find doctors, hospitals & more</p>
+                            </div>
+                            <svg class="dash-action-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2">
+                                <polyline points="9 18 15 12 9 6" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- System Status -->
+                    <div class="dash-system-status">
+                        <div class="dash-system-header">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <circle cx="12" cy="12" r="10" />
+                                <line x1="12" y1="16" x2="12" y2="12" />
+                                <line x1="12" y1="8" x2="12.01" y2="8" />
+                            </svg>
+                            System Status
+                        </div>
+                        <div class="dash-system-items">
+                            <div class="dash-system-item">
+                                <span class="dash-sys-dot online"></span>
+                                AI Engine — Online
+                            </div>
+                            <div class="dash-system-item">
+                                <span class="dash-sys-dot online"></span>
+                                OCR Service — Ready
+                            </div>
+                            <div class="dash-system-item">
+                                <span class="dash-sys-dot online"></span>
+                                Chatbot (RAG) — Active
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ===== HISTORY SECTION ===== -->
+            <div id="history" class="section">
+                <div class="section-head row-between">
+                    <div>
+                        <h2>Report History</h2>
+                        <p>View and manage all your uploaded medical reports</p>
+                    </div>
+                    <div class="history-head-actions">
+                        <button class="btn btn-green btn-sm" onclick="openCompareModal()" id="compareBtn"
+                            style="display:none;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <rect x="2" y="3" width="8" height="18" rx="1" />
+                                <rect x="14" y="3" width="8" height="18" rx="1" />
+                            </svg>
+                            Compare Reports
+                        </button>
+                        <button class="btn btn-outline btn-sm" onclick="clearHistory()" id="clearHistoryBtn"
+                            style="display:none;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <polyline points="3 6 5 6 21 6" />
+                                <path
+                                    d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                            </svg>
+                            Clear All
+                        </button>
+                    </div>
+                </div>
+                <div class="history-empty" id="historyEmpty">
+                    <div class="empty-icon-wrap">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1.5" opacity="0.4">
+                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+                            <line x1="8" y1="21" x2="16" y2="21" />
+                            <line x1="12" y1="17" x2="12" y2="21" />
+                        </svg>
+                    </div>
+                    <h3>No reports analyzed yet</h3>
+                    <p>Upload a medical report to get started!</p>
+                    <button class="btn btn-primary" style="margin-top: 20px;" onclick="showSection('home')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="17 8 12 3 7 8" />
+                            <line x1="12" y1="3" x2="12" y2="15" />
+                        </svg>
+                        Upload Report
+                    </button>
+                </div>
+                <div class="history-list" id="historyList"></div>
+            </div>
+
+            <!-- ===== ABOUT SECTION ===== -->
+            <div id="about" class="section">
+                <div class="about-container">
+                    <div class="about-hero">
+                        <h2>About SwasthyaMitra</h2>
+                        <p class="mission-statement">
+                            Empowering patients with <span>clear, AI-driven insights</span> into their medical health.
+                        </p>
+                    </div>
+
+                    <div class="about-split">
+                        <div class="about-text">
+                            <h3>Our Mission</h3>
+                            <p>
+                                Navigating medical reports can be overwhelming. SwasthyaMitra bridges the gap between
+                                complex
+                                medical data and patient understanding.
+                                Built with <span class="highlight-green">precision</span> and <span
+                                    class="highlight-orange">empathy</span>, our AI companion translates jargon into
+                                plain
+                                English.
+                            </p>
+
+                            <div class="about-values">
+                                <div class="value-item">
+                                    <div class="value-icon green">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2">
+                                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h4>Privacy First</h4>
+                                        <p>Your reports are processed locally and deleted immediately after analysis. We
+                                            never
+                                            store your personal health data.</p>
+                                    </div>
+                                </div>
+                                <div class="value-item">
+                                    <div class="value-icon orange">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2">
+                                            <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h4>Medical Accuracy</h4>
+                                        <p>Powered by the advanced Llama model, ensuring high-quality,
+                                            context-aware interpretations.</p>
+                                    </div>
+                                </div>
+                                <div class="value-item">
+                                    <div class="value-icon green">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2">
+                                            <circle cx="12" cy="12" r="10" />
+                                            <polyline points="12 6 12 12 16 14" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h4>Instant Clarity</h4>
+                                        <p>No more waiting for appointments to understand your results. Get peaceful
+                                            insights in
+                                            seconds.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="about-visual">
+                            <div class="visual-card">
+                                <div class="visual-icon-large">
+                                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white"
+                                        stroke-width="2">
+                                        <path
+                                            d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
+                                        </path>
+                                    </svg>
+                                </div>
+                                <h4>Your Health Companion</h4>
+                                <p>Always here to help you understand.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <style>
+                        .about-cards-row {
+                            display: flex;
+                            gap: 24px;
+                            margin: 40px 0;
+                            flex-wrap: wrap;
+                        }
+
+                        .origin-card,
+                        .vision-card {
+                            flex: 1;
+                            min-width: 300px;
+                            border-radius: 16px;
+                            padding: 32px;
+                            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+                            transition: transform 0.3s ease, box-shadow 0.3s ease;
+                        }
+
+                        .origin-card:hover,
+                        .vision-card:hover {
+                            transform: translateY(-5px);
+                            box-shadow: 0 10px 25px rgba(139, 92, 246, 0.1);
+                        }
+
+                        .origin-card {
+                            background: var(--bg-card);
+                            border: 1px solid var(--border);
+                        }
+
+                        .origin-card h3 {
+                            font-size: 1.25rem;
+                            color: var(--text-color);
+                            margin-top: 0;
+                            margin-bottom: 20px;
+                            font-weight: 700;
+                        }
+
+                        .origin-card blockquote {
+                            border-left: 4px solid #8b5cf6;
+                            margin: 0 0 16px 0;
+                            padding-left: 16px;
+                            font-size: 1.1rem;
+                            font-style: italic;
+                            color: var(--text-color);
+                        }
+
+                        .origin-card p {
+                            color: var(--text-muted);
+                            line-height: 1.6;
+                            margin-bottom: 16px;
+                        }
+
+                        .origin-card .signature {
+                            margin-top: 24px;
+                            font-weight: 600;
+                            color: var(--text-color);
+                            margin-bottom: 0;
+                        }
+
+                        .vision-card {
+                            background: linear-gradient(135deg, #a855f7, #6366f1);
+                            color: white;
+                            border: 1px solid transparent;
+                            /* matches origin dimensions */
+                        }
+
+                        .vision-card h3 {
+                            font-size: 1.25rem;
+                            color: white;
+                            margin-top: 0;
+                            margin-bottom: 20px;
+                            font-weight: 700;
+                        }
+
+                        .vision-card p {
+                            color: rgba(255, 255, 255, 0.9);
+                            line-height: 1.6;
+                            margin-bottom: 16px;
+                        }
+
+                        .vision-card strong {
+                            color: white;
+                        }
+
+                        .vision-card .signature {
+                            margin-top: 24px;
+                            font-weight: 600;
+                            margin-bottom: 0;
+                            font-style: italic;
+                            color: white;
+                        }
+                    </style>
+
+                    <div class="about-cards-row">
+                        <!-- Origin Story Card -->
+                        <div class="origin-card">
+                            <h3>🌱 Origin Story — Why We Built SwasthyaMitra</h3>
+                            <blockquote>
+                                <p>"It started with a phone call from my mother."</p>
+                            </blockquote>
+                            <p>She had just returned from a routine checkup. The doctor handed her a blood report — two
+                                pages of numbers, abbreviations, and medical terms. She called me, worried, reading out
+                                values she didn't understand. I'm not a doctor. I spent an hour googling each term,
+                                still unsure if I was interpreting it right.</p>
+                            <p>That moment of helplessness — felt by millions of families across India every single day
+                                — became the seed of SwasthyaMitra.</p>
+                            <p>We built this so that no one has to feel lost holding their own health report. Your
+                                body's story deserves to be told in a language you understand.</p>
+                            <p class="signature">— The SwasthyaMitra Team</p>
+                        </div>
+
+                        <!-- Vision Card -->
+                        <div class="vision-card">
+                            <h3>🔭 Our Vision</h3>
+                            <p>We envision a future where every Indian — regardless of education, language, or location
+                                — can understand their own health without confusion or fear.</p>
+                            <p>Today, medical literacy is a privilege. We're making it a right.</p>
+                            <p>SwasthyaMitra is our first step toward a world where patients walk into doctor's
+                                appointments already informed, where rural families don't misread critical reports, and
+                                where AI becomes the bridge between medicine and people.</p>
+                            <p><strong>Health clarity for 1.4 billion. That's our mission.</strong></p>
+                            <p class="signature">~TIRTH SHAH</p>
+                        </div>
+                    </div>
+
+                    <!-- Testimonials Section -->
+                    <style>
+                        .testimonials-section {
+                            margin: 60px 0 40px;
+                        }
+
+                        .testimonials-header {
+                            text-align: center;
+                            margin-bottom: 30px;
+                        }
+
+                        .testimonials-header h3 {
+                            font-size: 1.75rem;
+                            font-weight: 800;
+                            color: var(--text-color, #1f2937);
+                        }
+
+                        .testimonials-grid {
+                            display: grid;
+                            grid-template-columns: repeat(3, 1fr);
+                            gap: 24px;
+                            overflow-x: auto;
+                            padding-bottom: 20px;
+                            scroll-snap-type: x mandatory;
+                            scrollbar-width: none;
+                            /* Firefox */
+                            -ms-overflow-style: none;
+                            /* IE and Edge */
+                        }
+
+                        .testimonials-grid::-webkit-scrollbar {
+                            display: none;
+                            /* Chrome, Safari and Opera */
+                        }
+
+                        .testimonial-card {
+                            background: rgba(255, 255, 255, 0.6);
+                            backdrop-filter: blur(12px);
+                            -webkit-backdrop-filter: blur(12px);
+                            border: 1px solid rgba(139, 92, 246, 0.2);
+                            border-radius: 16px;
+                            padding: 28px;
+                            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+                            transition: transform 0.3s ease, box-shadow 0.3s ease;
+                            scroll-snap-align: start;
+                            display: flex;
+                            flex-direction: column;
+                            min-width: 300px;
+                        }
+
+                        .testimonial-card:hover {
+                            transform: translateY(-5px);
+                            box-shadow: 0 10px 25px rgba(139, 92, 246, 0.15);
+                        }
+
+                        .testimonial-header {
+                            display: flex;
+                            align-items: center;
+                            justify-content: space-between;
+                            margin-bottom: 20px;
+                        }
+
+                        .testimonial-user {
+                            display: flex;
+                            align-items: center;
+                            gap: 12px;
+                        }
+
+                        .testimonial-avatar {
+                            width: 48px;
+                            height: 48px;
+                            border-radius: 50%;
+                            background: linear-gradient(135deg, #c4b5fd, #8b5cf6);
+                            color: white;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-weight: 700;
+                            font-size: 1.2rem;
+                        }
+
+                        .testimonial-info h4 {
+                            margin: 0;
+                            font-size: 1.05rem;
+                            color: var(--text-color, #1f2937);
+                            font-weight: 700;
+                        }
+
+                        .testimonial-info p {
+                            margin: 0;
+                            font-size: 0.85rem;
+                            color: var(--text-muted, #6b7280);
+                        }
+
+                        .testimonial-stars {
+                            display: flex;
+                            gap: 2px;
+                            color: #f59e0b;
+                        }
+
+                        .testimonial-stars svg {
+                            width: 16px;
+                            height: 16px;
+                            fill: currentColor;
+                        }
+
+                        .testimonial-body {
+                            color: var(--text-muted, #4b5563);
+                            font-size: 0.95rem;
+                            line-height: 1.6;
+                            font-style: italic;
+                            position: relative;
+                            flex-grow: 1;
+                        }
+
+                        .testimonial-body::before {
+                            content: "\201C";
+                            font-size: 4rem;
+                            color: rgba(139, 92, 246, 0.15);
+                            position: absolute;
+                            top: -20px;
+                            left: -10px;
+                            font-family: serif;
+                            z-index: 0;
+                            line-height: 1;
+                        }
+
+                        .testimonial-body p {
+                            position: relative;
+                            z-index: 1;
+                            margin: 0;
+                        }
+
+                        @media (max-width: 900px) {
+                            .testimonials-grid {
+                                grid-template-columns: repeat(3, minmax(300px, 1fr));
+                            }
+                        }
+
+                        /* Dark mode specifics */
+                        body.dark-mode .testimonial-card {
+                            background: rgba(30, 41, 59, 0.6);
+                            border: 1px solid rgba(139, 92, 246, 0.3);
+                        }
+                    </style>
+
+                    <div class="testimonials-section">
+                        <div class="testimonials-header">
+                            <h3>⭐ What Our Users Say ⭐</h3>
+                        </div>
+                        <div class="testimonials-grid">
+
+                            <!-- Testimonial 1 -->
+                            <div class="testimonial-card">
+                                <div class="testimonial-header">
+                                    <div class="testimonial-user">
+                                        <div class="testimonial-avatar">P</div>
+                                        <div class="testimonial-info">
+                                            <h4>Kiara Advani</h4>
+                                            <p>Rishikesh, Uttarakhand</p>
+                                        </div>
+                                    </div>
+                                    <div class="testimonial-stars">
+                                        <svg viewBox="0 0 24 24">
+                                            <path
+                                                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                        </svg>
+                                        <svg viewBox="0 0 24 24">
+                                            <path
+                                                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                        </svg>
+                                        <svg viewBox="0 0 24 24">
+                                            <path
+                                                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                        </svg>
+                                        <svg viewBox="0 0 24 24">
+                                            <path
+                                                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                        </svg>
+                                        <svg viewBox="0 0 24 24">
+                                            <path
+                                                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="testimonial-body">
+                                    <p>"I received my thyroid report and honestly had no idea what TSH or T3 levels
+                                        meant. SwasthyaMitra explained everything in simple Hindi-friendly English
+                                        within seconds. I finally walked into my doctor's appointment feeling confident,
+                                        not clueless. This app is a blessing for people like me."</p>
+                                </div>
+                            </div>
+
+                            <!-- Testimonial 2 -->
+                            <div class="testimonial-card">
+                                <div class="testimonial-header">
+                                    <div class="testimonial-user">
+                                        <div class="testimonial-avatar">R</div>
+                                        <div class="testimonial-info">
+                                            <h4>Rudra Shah</h4>
+                                            <p>Ahmedabad, Gujarat</p>
+                                        </div>
+                                    </div>
+                                    <div class="testimonial-stars">
+                                        <svg viewBox="0 0 24 24">
+                                            <path
+                                                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                        </svg>
+                                        <svg viewBox="0 0 24 24">
+                                            <path
+                                                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                        </svg>
+                                        <svg viewBox="0 0 24 24">
+                                            <path
+                                                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                        </svg>
+                                        <svg viewBox="0 0 24 24">
+                                            <path
+                                                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                        </svg>
+                                        <!-- Half star SVG -->
+                                        <svg viewBox="0 0 24 24">
+                                            <defs>
+                                                <linearGradient id="halfGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                                    <stop offset="50%" stop-color="#f59e0b" />
+                                                    <stop offset="50%" stop-color="#d1d5db" />
+                                                </linearGradient>
+                                            </defs>
+                                            <path fill="url(#halfGrad)"
+                                                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="testimonial-body">
+                                    <p>"My father's CBC report had flagged some values and we were panicking at midnight
+                                        — no doctor available, no clarity. SwasthyaMitra broke it down calmly, told us
+                                        what was concerning and what wasn't, and suggested we follow up on specific
+                                        points. It didn't replace our doctor, but it gave us peace of mind when we
+                                        needed it most."</p>
+                                </div>
+                            </div>
+
+                            <!-- Testimonial 3 -->
+                            <div class="testimonial-card">
+                                <div class="testimonial-header">
+                                    <div class="testimonial-user">
+                                        <div class="testimonial-avatar">A</div>
+                                        <div class="testimonial-info">
+                                            <h4>Rashmika Mandanna</h4>
+                                            <p>Bengaluru, Karnataka</p>
+                                        </div>
+                                    </div>
+                                    <div class="testimonial-stars">
+                                        <svg viewBox="0 0 24 24">
+                                            <path
+                                                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                        </svg>
+                                        <svg viewBox="0 0 24 24">
+                                            <path
+                                                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                        </svg>
+                                        <svg viewBox="0 0 24 24">
+                                            <path
+                                                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                        </svg>
+                                        <svg viewBox="0 0 24 24">
+                                            <path
+                                                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                        </svg>
+                                        <svg viewBox="0 0 24 24">
+                                            <path
+                                                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="testimonial-body">
+                                    <p>"As a working woman managing my own health alone, I used to dread reading lab
+                                        reports. SwasthyaMitra changed that completely. It's like having a calm,
+                                        knowledgeable friend explain everything without judgment. My vitamin D and iron
+                                        reports finally made sense. I've already recommended it to 5 of my friends!"</p>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="about-disclaimer">
+                        <div class="disclaimer-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path
+                                    d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                                <line x1="12" y1="9" x2="12" y2="13" />
+                                <line x1="12" y1="17" x2="12.01" y2="17" />
+                            </svg>
+                        </div>
+                        <div>
+                            <strong>Important Medical Disclaimer</strong>
+                            <p>SwasthyaMitra is an AI tool for medical report analysis. It is <strong>not a substitute
+                                    for
+                                    professional medical advice</strong>, diagnosis, or treatment. Always consult a
+                                qualified healthcare provider/doctor for any medical concerns. SwasthyaMitra shall
+                                not be held responsible for any actions taken based on its output.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== SUPPORT SECTION ===== -->
+            <div id="support" class="section">
+
+                <!-- Huge Support Hero -->
+                <div
+                    style="text-align: center; margin-bottom: 3rem; padding: 3rem 1rem; background: linear-gradient(to bottom, var(--bg-card), transparent); border-radius: 20px;">
+                    <div
+                        style="display: inline-flex; align-items: center; justify-content: center; width: 64px; height: 64px; background: rgba(139, 92, 246, 0.15); border-radius: 20px; color: #8b5cf6; margin-bottom: 20px;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                        </svg>
+                    </div>
+                    <h2
+                        style="font-size: 2.5rem; font-weight: 800; background: linear-gradient(135deg, #7c3aed, #4f46e5); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 12px;">
+                        How can we help you?</h2>
+                    <p
+                        style="font-size: 1.15rem; color: var(--text-muted); max-width: 500px; margin: 0 auto; line-height: 1.6;">
+                        Everything you need to know about using SwasthyaMitra securely and efficiently.</p>
+                </div>
+
+                <!-- Beautiful FAQ Grid -->
+                <style>
+                    .support-faq-grid {
+                        display: grid;
+                        grid-template-columns: 1fr;
+                        gap: 24px;
+                    }
+
+                    @media (min-width: 768px) {
+                        .support-faq-grid {
+                            grid-template-columns: repeat(2, 1fr);
+                        }
+                    }
+                </style>
+                <div class="support-faq-grid">
+
+                    <!-- Card 1 -->
+                    <div class="feature-card"
+                        style="padding: 32px; text-align: left; background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 16px; transition: transform 0.3s ease, box-shadow 0.3s ease; cursor: default;"
+                        onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 25px rgba(139, 92, 246, 0.1)';"
+                        onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 20px rgba(0,0,0,0.02)';">
+                        <div
+                            style="width: 48px; height: 48px; background: linear-gradient(135deg, #10b981, #059669); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                        </div>
+                        <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--text-color); margin: 0;">Uploading
+                            Reports</h3>
+                        <p style="color: var(--text-muted); line-height: 1.6; margin: 0;">Navigate to the
+                            <strong>Home</strong> dashboard or click <em>Upload Report</em> from the tools menu. You can
+                            drag and drop your clinical documents instantly.
+                        </p>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div class="feature-card"
+                        style="padding: 32px; text-align: left; background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 16px; transition: transform 0.3s ease, box-shadow 0.3s ease; cursor: default;"
+                        onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 25px rgba(245, 158, 11, 0.1)';"
+                        onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 20px rgba(0,0,0,0.02)';">
+                        <div
+                            style="width: 48px; height: 48px; background: linear-gradient(135deg, #f59e0b, #d97706); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                            </svg>
+                        </div>
+                        <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--text-color); margin: 0;">Supported
+                            Formats</h3>
+                        <p style="color: var(--text-muted); line-height: 1.6; margin: 0;">Our system natively interprets
+                            <strong>PDFs</strong>, as well as high-contrast scans inside <strong>JPG</strong> and
+                            <strong>PNG</strong> formats.
+                        </p>
+                    </div>
+
+                    <!-- Card 3 -->
+                    <div class="feature-card"
+                        style="padding: 32px; text-align: left; background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 16px; transition: transform 0.3s ease, box-shadow 0.3s ease; cursor: default;"
+                        onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 25px rgba(139, 92, 246, 0.1)';"
+                        onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 20px rgba(0,0,0,0.02)';">
+                        <div
+                            style="width: 48px; height: 48px; background: linear-gradient(135deg, #a855f7, #7e22ce); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 4px 12px rgba(168, 85, 247, 0.2);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                            </svg>
+                        </div>
+                        <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--text-color); margin: 0;">Data
+                            Privacy Guarantee</h3>
+                        <p style="color: var(--text-muted); line-height: 1.6; margin: 0;">Your health data is entirely
+                            confidential. Medical reports are processed directly in local memory and are <strong>wiped
+                                immediately</strong> post-analysis.</p>
+                    </div>
+
+                    <!-- Card 4 -->
+                    <div class="feature-card"
+                        style="padding: 32px; text-align: left; background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 16px; transition: transform 0.3s ease, box-shadow 0.3s ease; cursor: default;"
+                        onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 10px 25px rgba(6, 182, 212, 0.1)';"
+                        onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 20px rgba(0,0,0,0.02)';">
+                        <div
+                            style="width: 48px; height: 48px; background: linear-gradient(135deg, #06b6d4, #0891b2); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 4px 12px rgba(6, 182, 212, 0.2);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                        </div>
+                        <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--text-color); margin: 0;">
+                            SwasthyaBot Capabilities</h3>
+                        <p style="color: var(--text-muted); line-height: 1.6; margin: 0;">Our localized RAG engine is
+                            fully aware of doctors, hospitals, and clinics across major districts of Ahmedabad, Gujarat,
+                            and Maharashtra.</p>
+                    </div>
+
+                </div>
+
+                <!-- Premium Contact Banner -->
+                <div
+                    style="margin-top: 3rem; position: relative; overflow: hidden; border-radius: 20px; background: linear-gradient(135deg, #1e1b4b, #312e81); box-shadow: 0 15px 30px rgba(49, 46, 129, 0.2); text-align: left;">
+
+                    <!-- Decorative BG Elements -->
+                    <div
+                        style="position: absolute; right: -50px; top: -50px; width: 250px; height: 250px; background: radial-gradient(circle, rgba(139,92,246,0.3) 0%, rgba(255,255,255,0) 70%); border-radius: 50%; pointer-events: none;">
+                    </div>
+                    <div
+                        style="position: absolute; left: 10%; bottom: -80px; width: 200px; height: 200px; background: radial-gradient(circle, rgba(99,102,241,0.2) 0%, rgba(255,255,255,0) 70%); border-radius: 50%; pointer-events: none;">
+                    </div>
+
+                    <div style="display: flex; flex-wrap: wrap; position: relative; z-index: 2;">
+                        <!-- Text Side -->
+                        <div style="flex: 1 1 300px; padding: 40px;">
+                            <h3 style="font-size: 1.75rem; font-weight: 800; color: white; margin-bottom: 8px;">Still
+                                got a
+                                medical inquiry?</h3>
+                            <p
+                                style="color: #c7d2fe; font-size: 1.1rem; margin: 0; max-width: 400px; line-height: 1.5;">
+                                Our
+                                highly specialized technical team is constantly active and ready to seamlessly assist
+                                you
+                                with SwasthyaMitra.</p>
+                        </div>
+
+                        <!-- Form Side -->
+                        <div
+                            style="flex: 1 1 350px; padding: 32px 40px; background: rgba(0,0,0,0.15); border-left: 1px solid rgba(255,255,255,0.05); backdrop-filter: blur(10px);">
+                            <form id="supportContactForm" onsubmit="handleSupportSubmit(event)"
+                                style="display: flex; flex-direction: column; gap: 16px; margin: 0;">
+                                <div>
+                                    <input type="email" id="supportEmail" placeholder="Your Email Address" required
+                                        style="width: 100%; padding: 14px 16px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; color: white; font-family: inherit; font-size: 14px; outline: none; transition: all 0.2s;"
+                                        onfocus="this.style.background='rgba(255,255,255,0.12)'; this.style.borderColor='rgba(139,92,246,0.6)';"
+                                        onblur="this.style.background='rgba(255,255,255,0.08)'; this.style.borderColor='rgba(255,255,255,0.15)';">
+                                </div>
+                                <div>
+                                    <textarea id="supportMessage" placeholder="How can we help you?" rows="3" required
+                                        style="width: 100%; padding: 14px 16px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; color: white; font-family: inherit; font-size: 14px; outline: none; transition: all 0.2s; resize: vertical;"
+                                        onfocus="this.style.background='rgba(255,255,255,0.12)'; this.style.borderColor='rgba(139,92,246,0.6)';"
+                                        onblur="this.style.background='rgba(255,255,255,0.08)'; this.style.borderColor='rgba(255,255,255,0.15)';"></textarea>
+                                </div>
+                                <button type="submit" id="supportSubmitBtn"
+                                    style="background: white; color: #312e81; font-weight: 700; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.2); padding: 14px 28px; border-radius: 12px; font-size: 1.05rem; transition: transform 0.2s ease, box-shadow 0.2s ease; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;"
+                                    onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(0,0,0,0.3)';"
+                                    onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(0,0,0,0.2)';">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2.5">
+                                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                                    </svg>
+                                    <span>Send Message</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ========== FOOTER ========== -->
+            <footer class="footer">
+                <p>Built with ❤️ by Team<strong> SwasthyaMitra </strong> | All Copyrights reserved &copy; 2026</p>
+                <p style="margin-top: 8px; font-size: 13px;">Tirth Shah • Deep Sangani • Nishi Prajapati</p>
+            </footer>
+
+        </main>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <!-- ========== COMPARE MODAL ========== -->
+    <div class="compare-overlay" id="compareOverlay" onclick="closeCompareModal()">
+        <div class="compare-modal" onclick="event.stopPropagation()">
+            <div class="compare-modal-header">
+                <h3>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="2" y="3" width="8" height="18" rx="1" />
+                        <rect x="14" y="3" width="8" height="18" rx="1" />
+                    </svg>
+                    Compare Reports
+                </h3>
+                <button class="compare-close" onclick="closeCompareModal()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.5">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
+            </div>
+            <!-- Selection Step -->
+            <div class="compare-select-step" id="compareSelectStep">
+                <p class="compare-instruction">Select two reports to compare side by side</p>
+                <div class="compare-pickers">
+                    <div class="compare-picker">
+                        <label>Report A</label>
+                        <select id="compareSelectA" class="compare-dropdown"></select>
+                    </div>
+                    <div class="compare-vs">VS</div>
+                    <div class="compare-picker">
+                        <label>Report B</label>
+                        <select id="compareSelectB" class="compare-dropdown"></select>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="runComparison()" style="margin-top:20px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="16 3 21 3 21 8" />
+                        <line x1="4" y1="20" x2="21" y2="3" />
+                        <polyline points="21 16 21 21 16 21" />
+                        <line x1="15" y1="15" x2="21" y2="21" />
+                        <line x1="4" y1="4" x2="9" y2="9" />
+                    </svg>
+                    Compare Now
+                </button>
+            </div>
+            <!-- Result Step -->
+            <div class="compare-result-step" id="compareResultStep" style="display:none;">
+                <button class="btn btn-outline btn-sm" onclick="backToSelection()" style="margin-bottom:16px;">
+                    ← Back to Selection
+                </button>
+                <div class="compare-grid">
+                    <div class="compare-panel">
+                        <div class="compare-panel-head" id="comparePanelHeadA">Report A</div>
+                        <div class="compare-panel-body" id="comparePanelBodyA"></div>
+                    </div>
+                    <div class="compare-divider"></div>
+                    <div class="compare-panel">
+                        <div class="compare-panel-head" id="comparePanelHeadB">Report B</div>
+                        <div class="compare-panel-body" id="comparePanelBodyB"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== CHATBOT ========== -->
+    <!-- Floating Toggle Button -->
+    <button class="chatbot-toggle" id="chatbotToggle" onclick="toggleChatbot()" title="Chat with MediBot">
+        <svg id="chatIconOpen" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+        </svg>
+        <svg id="chatIconClose" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+    </button>
+
+    <!-- Chat Window -->
+    <div class="chatbot-window" id="chatbotWindow">
+        <div class="chatbot-header">
+            <div class="chatbot-header-info">
+                <div class="chatbot-avatar">🤖</div>
+                <div>
+                    <h4>SwasthyaBot</h4>
+                    <span class="chatbot-status">Doctor's Data Assistant</span>
+                </div>
+            </div>
+            <button class="chatbot-close" onclick="toggleChatbot()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+            </button>
+        </div>
+        <div class="chatbot-messages" id="chatbotMessages">
+            <div class="chat-msg bot">
+                <div class="chat-bubble">Hello! 👋 I'm <strong>SwasthyaBot</strong>, your Doctor's Data assistant.
+                    Ask me about doctors, hospitals, or health centers across <strong>Ahmedabad, Gujarat or
+                        Maharashtra</strong>!
+                </div>
+            </div>
+        </div>
+        <div class="chatbot-input-area">
+            <input type="text" class="chatbot-input" id="chatbotInput" placeholder="Type a message..."
+                onkeydown="if(event.key==='Enter')sendChatMessage()" autocomplete="off" />
+            <button class="chatbot-send" onclick="sendChatMessage()" title="Send">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13" />
+                    <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+
+</html>
